@@ -33,3 +33,6 @@
 .idea/*
 .idea/
 cmake-build-debug/*
+
+third_party/*
+bazel-*
