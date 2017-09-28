@@ -6,61 +6,61 @@
 
     Usage: bazel <command> <options> ...
 
-	    Available commands:
-		    analyze-profile     Analyzes build profile data.
-			    build               Builds the specified targets.
-				    canonicalize-flags  Canonicalizes a list of bazel options.
-					    clean               Removes output files and optionally stops the server.
-						    coverage            Generates code coverage report for specified test targets.
-							    dump                Dumps the internal state of the bazel server process.
-								    fetch               Fetches external repositories that are prerequisites to the targets.
-									    help                Prints help for commands, or the index.
-										    info                Displays runtime info about the bazel server.
-											    license             Prints the license of this software.
-												    mobile-install      Installs targets to mobile devices.
-													    query               Executes a dependency graph query.
-														    run                 Runs the specified target.
-															    shutdown            Stops the bazel server.
-																    test                Builds and runs the specified test targets.
-																	    version             Prints version information for bazel.
+    Available commands:
+    analyze-profile     Analyzes build profile data.
+    build               Builds the specified targets.
+    canonicalize-flags  Canonicalizes a list of bazel options.
+    clean               Removes output files and optionally stops the server.
+    coverage            Generates code coverage report for specified test targets.
+    dump                Dumps the internal state of the bazel server process.
+    fetch               Fetches external repositories that are prerequisites to the targets.
+    help                Prints help for commands, or the index.
+    info                Displays runtime info about the bazel server.
+    license             Prints the license of this software.
+    mobile-install      Installs targets to mobile devices.
+    query               Executes a dependency graph query.
+    run                 Runs the specified target.
+    shutdown            Stops the bazel server.
+    test                Builds and runs the specified test targets.
+    version             Prints version information for bazel.
 
-
-																		看上去和maven差不太多，以一个实际项目来介绍一下基本命令的使用。
+看上去和maven差不太多，以一个实际项目来介绍一下基本命令的使用。
 
 ### bazel build
 
-																		在目录下建立test文件夹和WORKSPACE，并在test下创建两个文件，分别如下：
+在目录下建立test文件夹和WORKSPACE，并在test下创建两个文件，分别如下：
 
-																		    ├── test
-																			    │   ├── BUILD
-																				    │   └── test.cc
-																					    └── WORKSPACE
+    ├── test
+    │   ├── BUILD
+    │   └── test.cc
+    └── WORKSPACE
+ 
+ 
+内容如下：
 
-																						内容如下：
+BUILD:
 
-																						BUILD:
+    package(default_visibility = ["//visibility:public"])
 
-																						    package(default_visibility = ["//visibility:public"])
+    cc_binary(
+        name = "test",
+        srcs = [
+            "test.cc",
+        ],
+    )
+    
+WORKSPACE为空
 
-																							    cc_binary(
-																										        name = "test",
-																												        srcs = [
-																														            "test.cc",
-																																	        ],
-																																			    )
+test.cc:
 
-																								WORKSPACE为空
+    #include <iostream>
 
-																								test.cc:
+    int main() 
+    {
+        std::cout<<"test"<<std::endl;
 
-																								    #include <iostream>
-
-																								    int main() 
-	    {
-			        std::cout<<"test"<<std::endl;
-
-					        return 0;
-							    }
+        return 0;
+    }
 
 其中：WORKSPACE和BUILD是bazel项目必须的文件，test.cc是我们自己定义的c++文件，.cc后缀是unix系统的后缀，.cpp是非unix系统。
 
@@ -70,55 +70,51 @@
 
     bazel build [target]
 
-	本例中：
+本例中：
 
-	    bazel build test/...
+    bazel build test/...
 
+**注意是３个点！**
 
+编译成功的结果：
 
-		**注意是３个点！**
+	INFO: Analysed target //test:test (0 packages loaded). 
+	INFO: Found 1 target...
+    Target //test:test up-to-date:
+    bazel-bin/test/test
+    INFO: Elapsed time: 0.219s, Critical Path: 0.01s
+    INFO: Build completed successfully, 1 total action
 
-		编译成功的结果：
+目录结果变为：
 
-		    INFO: Analysed target //test:test (0 packages loaded).
-			    INFO: Found 1 target...
-				    Target //test:test up-to-date:
-					        bazel-bin/test/test
-							    INFO: Elapsed time: 0.219s, Critical Path: 0.01s
-								    INFO: Build completed successfully, 1 total action
+    ├── bazel-bin -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out/local-fastbuild/bin
+	├── bazel-genfiles -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out/local-fastbuild/genfiles
+	├── bazel-out -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out
+	├── bazel-test -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__
+	├── bazel-testlogs -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out/local-fastbuild/testlogs
+	├── test
+	│   ├── BUILD
+	│   └── test.cc
+	└── WORKSPACE
 
-									目录结果变为：
+在bazel-bin/test/test.runfiles/__main__/test目录下有二进制文件，运行：
 
-									    ├── bazel-bin -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out/local-fastbuild/bin
-										    ├── bazel-genfiles -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out/local-fastbuild/genfiles
-											    ├── bazel-out -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out
-												    ├── bazel-test -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__
-													    ├── bazel-testlogs -> /home/mobvoi/.cache/bazel/_bazel_mobvoi/74778f1ed6b087a47652b1c57f0f5d45/execroot/__main__/bazel-out/local-fastbuild/testlogs
-														    ├── test
-															    │   ├── BUILD
-																    │   └── test.cc
-																	    └── WORKSPACE
+    $ ./test
+    test
 
-																		在bazel-bin/test/test.runfiles/__main__/test目录下有二进制文件，运行：
-
-																		    $ ./test
-																			    test
-
-																				至此bazel编译成功！
-
+至此bazel编译成功！
 
 ### bazel run
-
-																				bazel build用来编译cpp为二进制文件，除此之外还可以直接运行cpp文件中的main函数。
+	bazel build用来编译cpp为二进制文件，除此之外还可以直接运行cpp文件中的main函数。
 
 ### bazel query
 
-																				用来查看依赖树。
+	用来查看依赖树。
 
 ### bazel test
 
-																				类似mvn test，运行代码中的单测。
+	类似mvn test，运行代码中的单测。
 
 ### bazel clean
 
-																				清除编译的结果，类似mvn clean。
+	清除编译的结果，类似mvn clean。
