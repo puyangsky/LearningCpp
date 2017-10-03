@@ -1,4 +1,4 @@
-git add -n
+git add -n .
 echo "continue?y/n:"
 read contin
 if [[ $contin != 'y' && $contin != 'Y' ]];then
